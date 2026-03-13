@@ -1,0 +1,16 @@
+- name: install docker
+  package:
+    name: docker
+    state: present
+
+- name: start docker
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: add jenkins user to docker
+  user:
+    name: jenkins
+    groups: docker
+    append: yes

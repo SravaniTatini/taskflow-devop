@@ -1,0 +1,68 @@
+pipeline {
+
+ agent any
+
+ environment {
+
+  IMAGE = "sravani2310/taskflow"
+
+ }
+
+ stages {
+
+ stage('Checkout'){
+  steps{
+   git 'https://github.com/SravaniTatini/taskflow-devop.git'
+  }
+ }
+
+ stage('Build'){
+  steps{
+   dir('app/taskflow'){
+    sh 'mvn clean package -DskipTests'
+   }
+  }
+ }
+
+ stage('SonarQube Scan'){
+  steps{
+   dir('app/taskflow'){
+    sh 'mvn sonar:sonar'
+   }
+  }
+ }
+
+ stage('Docker Build'){
+  steps{
+   dir('app/taskflow'){
+    sh 'docker build -t $IMAGE:$BUILD_NUMBER .'
+   }
+  }
+ }
+
+ stage('Trivy Scan'){
+  steps{
+   sh 'trivy image $IMAGE:$BUILD_NUMBER'
+  }
+ }
+
+ stage('Push Image to DockerHub') {
+            steps {
+
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USERNAME',
+                    passwordVariable: 'PASSWORD'
+                )]) {
+
+                    sh '''
+                    echo $PASSWORD | docker login -u $USERNAME --password-stdin
+                    docker push $IMAGE:$BUILD_NUMBER
+                    '''
+
+                }
+            }
+        }
+
+    }
+}
