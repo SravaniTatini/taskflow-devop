@@ -9,7 +9,7 @@ pipeline {
         DOCKER_IMAGE = "sravani2310/taskflow"
       
 
-        SONAR_HOST = "http://3.228.217.147:9000"
+        SONAR_HOST = "http://44.195.26.187:9000"
 
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
