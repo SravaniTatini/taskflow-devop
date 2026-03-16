@@ -54,7 +54,8 @@ pipeline {
 
         stage('Building Docker Image') {
             steps {
-                echo "✅ Building Docker image"
+                echo "✅ Building Doc
+                ker image"
                 sh """
                     docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -f app/taskflow/Dockerfile app/taskflow
                     docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
