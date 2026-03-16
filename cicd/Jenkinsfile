@@ -64,21 +64,18 @@ pipeline {
         }
 
         stage('SonarQube Scan') {
-            steps {
-                echo "✅ Running SonarQube scan"
-
-                dir("app/taskflow") {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        sh """
-                            mvn sonar:sonar \
-                            -Dsonar.projectKey=taskflow \
-                            -Dsonar.host.url=${SONAR_HOST} \
-                            -Dsonar.token=${SONAR_TOKEN}
-                        """
-                    }
-                }
+    steps {
+        dir("app/taskflow") {
+            withSonarQubeEnv('SonarQube') {
+                sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=taskflow
+                '''
             }
         }
+    }
+}
+}
 
         stage('Building Docker Image') {
             steps {
