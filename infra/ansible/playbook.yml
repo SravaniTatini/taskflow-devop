@@ -6,3 +6,5 @@
     - maven
     - kubectl
     - jenkins
+    - git
+    
