@@ -24,7 +24,17 @@ pipeline {
             }
         }
 
-    
+
+        stage('Building WAR') {
+            steps {
+                echo "✅ Building Spring Boot Application "
+                dir("app/taskflow") {
+                    sh "mvn clean package -DskipTests"
+                    sh "ls -ltr target"
+                }
+            }
+        }
+
         stage('SonarQube Scan') {
             steps {
                 echo "✅ Running SonarQube scan"
@@ -38,16 +48,6 @@ pipeline {
                             -Dsonar.token=${SONAR_TOKEN}
                         """
                     }
-                }
-            }
-        }
-
-        stage('Building WAR') {
-            steps {
-                echo "✅ Building Spring Boot Application "
-                dir("app/taskflow") {
-                    sh "mvn clean package -DskipTests"
-                    sh "ls -ltr target"
                 }
             }
         }
