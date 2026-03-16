@@ -7,9 +7,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "sravani2310/taskflow"
-      
-
-        SONAR_HOST = credentials('sonar-host-url')
 
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
