@@ -1,70 +1,90 @@
 pipeline {
+    agent any
 
- agent any
-
- environment {
-
-  IMAGE = "sravani2310/taskflow"
-
- }
-
- stages {
-
- stage('Checkout'){
-  steps{
-   git branch: 'main', url: 'https://github.com/SravaniTatini/taskflow-devop.git'
-  }
- }
-
- stage('Build'){
-  steps{
-   dir('app/taskflow'){
-    sh 'mvn clean package -DskipTests'
-   }
-  }
- }
-
- stage('SonarQube Analysis') {
-   steps {
-    withSonarQubeEnv('sonar-server') {
-     dir('app/taskflow') {
-      sh 'mvn sonar:sonar'
-     }
+    tools {
+        maven 'maven_3'
     }
-   }
-  }
 
- stage('Docker Build'){
-  steps{
-   dir('app/taskflow'){
-    sh 'docker build -t $IMAGE:$BUILD_NUMBER .'
-   }
-  }
- }
+    environment {
+        DOCKER_IMAGE = "sravani2310/taskflow""
+      
 
- stage('Trivy Scan'){
-  steps{
-   sh 'trivy image $IMAGE:$BUILD_NUMBER'
-  }
- }
+        SONAR_HOST = "http://3.228.217.147:9000"
 
- stage('Push Image to DockerHub') {
+        GIT_REPO_NAME = "taskflow-devop"
+        GIT_USER_NAME = "SravaniTatini"
+    }
+
+    stages {
+
+        stage('Checkout') {
             steps {
+                echo "✅ Cloning GitHub Repo"
+                git branch: 'main', url: "https://github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git"
+            }
+        }
 
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'USERNAME',
-                    passwordVariable: 'PASSWORD'
-                )]) {
+    
+        stage('SonarQube Scan') {
+            steps {
+                echo "✅ Running SonarQube scan"
 
-                    sh '''
-                    echo $PASSWORD | docker login -u $USERNAME --password-stdin
-                    docker push $IMAGE:$BUILD_NUMBER
-                    '''
-
+                dir("app/taskflow") {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            mvn clean verify sonar:sonar \
+                            -Dsonar.projectKey=taskflow \
+                            -Dsonar.host.url=${SONAR_HOST} \
+                            -Dsonar.token=${SONAR_TOKEN}
+                        """
+                    }
                 }
             }
         }
 
+        stage('Building WAR') {
+            steps {
+                echo "✅ Building Spring Boot Application "
+                dir("app/taskflow") {
+                    sh "mvn clean package -DskipTests"
+                    sh "ls -ltr target"
+                }
+            }
+        }
+
+        stage('Building Docker Image') {
+            steps {
+                echo "✅ Building Docker image"
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -f app/taskflow/Dockerfile app/taskflow
+                    docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+                """
+            }
+        }
+
+        stage('Trivy Scan -Image') {
+            steps {
+                echo "✅ Trivy Security scan for Docker image"
+                sh """
+                    trivy image --no-progress ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                """
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo "✅ Pushing image to DockerHub"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+
+                sh """
+                    docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    docker push ${DOCKER_IMAGE}:latest
+                """
+            }
+        }
+
     }
-}
