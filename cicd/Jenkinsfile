@@ -64,18 +64,18 @@ pipeline {
         }
 
         stage('SonarQube Scan') {
-    steps {
-        dir("app/taskflow") {
-            withSonarQubeEnv('SonarQube') {
-                sh '''
-                    mvn sonar:sonar \
-                    -Dsonar.projectKey=taskflow
-                '''
+            steps {
+                dir("app/taskflow") {
+                  withSonarQubeEnv('SonarQube') {
+                        sh '''
+                          mvn sonar:sonar \
+                          -Dsonar.projectKey=taskflow
+                        '''
+                    }
+                 }
             }
-        }
-    }
-}
-}
+     }
+
 
         stage('Building Docker Image') {
             steps {
