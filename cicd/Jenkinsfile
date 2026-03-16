@@ -9,13 +9,13 @@ pipeline {
         DOCKER_IMAGE = "sravani2310/taskflow"
       
 
-        SONAR_HOST = "http://54.175.141.56:9000"
+        SONAR_HOST = credentials('sonar-host-url')
 
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
 
         MYSQL_CONTAINER = "mysql-taskflow"
-        MYSQL_ROOT_PASSWORD = "root"
+        MYSQL_ROOT_PASSWORD = credentials('mysql-root-password')
         MYSQL_DATABASE = "taskflow"
     }
 
