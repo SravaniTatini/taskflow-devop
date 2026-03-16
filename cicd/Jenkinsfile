@@ -38,7 +38,7 @@ pipeline {
                     --name ${MYSQL_CONTAINER} \
                     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
                     -e MYSQL_DATABASE=${MYSQL_DATABASE} \
-                    -p 3306:3306 \
+                    -p 3307:3306 \
                     mysql:8
                 """
             }
