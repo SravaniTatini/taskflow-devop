@@ -6,6 +6,10 @@ pipeline {
     }
 
     environment {
+        MYSQL_CONTAINER = "mysql-taskflow"
+    }
+
+    environment {
         DOCKER_IMAGE = "sravani2310/taskflow"
       
 
