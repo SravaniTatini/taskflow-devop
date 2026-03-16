@@ -24,6 +24,30 @@ pipeline {
             }
         }
 
+    stage('Start MySQL Container') {
+            steps {
+                echo "Starting MySQL Docker container"
+                sh """
+                    docker rm -f ${MYSQL_CONTAINER} || true
+
+                    docker run -d \
+                    --name ${MYSQL_CONTAINER} \
+                    -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+                    -e MYSQL_DATABASE=${MYSQL_DATABASE} \
+                    -p 3306:3306 \
+                    mysql:8
+                """
+            }
+        }
+
+        stage('Wait for MySQL') {
+            steps {
+                echo "Waiting for MySQL to start..."
+                sh "sleep 25"
+            }
+        }
+
+
 
         stage('Building WAR') {
             steps {
