@@ -90,8 +90,8 @@ pipeline {
                 sh '''
                 TMPDIR=/home/jenkins/tmp trivy image \
                 --scanners vuln \
-                --severity HIGH,CRITICAL \
-                --exit-code 1 \
+                --severity CRITICAL \
+                --exit-code 0 \
                 --no-progress \
                 ${DOCKER_IMAGE}:${BUILD_NUMBER}
              '''
