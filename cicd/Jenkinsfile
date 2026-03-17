@@ -35,19 +35,44 @@ pipeline {
                     --name ${MYSQL_CONTAINER} \
                     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
                     -e MYSQL_DATABASE=${MYSQL_DATABASE} \
-                    -p 3307:3306 \
+                    -e MYSQL_USER=taskuser \
+                    -e MYSQL_PASSWORD=taskpassword \
+                    -p 3306:3306 \
+                    -v mysql_data:/var/lib/mysql \
                     mysql:8
-                """
+                   
+                    """
             }
         }
 
         stage('Wait for MySQL') {
             steps {
-                echo "Waiting for MySQL to start..."
-                sh "sleep 25"
+                echo "Waiting for MySQL to be ready..."
+                sh """
+                for i in {1..30}; do
+                  docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost -uroot -p${MYSQL_ROOT_PASSWORD} && break
+                  echo "Waiting for MySQL..."
+                  sleep 5
+                done
+                """
             }
         }
 
+
+         stage('Configure MySQL Access') {
+             steps {
+                 echo "Configuring MySQL access"
+                 sh """
+                 docker exec -i ${MYSQL_CONTAINER} mysql -uroot -p${MYSQL_ROOT_PASSWORD} <<EOF
+
+                 CREATE USER IF NOT EXISTS 'taskuser'@'%' IDENTIFIED BY 'taskpassword';
+                 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO 'taskuser'@'%';
+                 FLUSH PRIVILEGES;
+
+         EOF
+                """
+            }
+    }
 
 
         stage('Building WAR') {
