@@ -63,12 +63,12 @@ pipeline {
              steps {
                  echo "Configuring MySQL access"
                  sh '''
-                 docker exec -i "$MYSQL_CONTAINER" \
-                 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" \
+                 docker exec -i "$MYSQL_CONTAINER" mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "
 
-                 -e "CREATE USER IF NOT EXISTS 'taskuser'@'%' IDENTIFIED BY 'taskpassword';
-                 GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO 'taskuser'@'%';
-                 FLUSH PRIVILEGES;"
+        CREATE USER IF NOT EXISTS 'taskuser'@'%' IDENTIFIED BY 'taskpassword';
+        GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO 'taskuser'@'%';
+        FLUSH PRIVILEGES;
+        "
                  '''
             }
        }
