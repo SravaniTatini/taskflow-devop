@@ -3,8 +3,7 @@ kind: ConfigMap
 metadata:
   name: mysql-config
   namespace: taskflow
-
 data:
-  DB_HOST: "23.22.120.170"
+  DB_HOST: mysql
   DB_PORT: "3306"
-  DB_NAME: "taskflow"
+  DB_NAME: taskflow
