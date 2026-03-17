@@ -1,2 +1,2 @@
 [jenkins]
-54.175.141.56 ansible_user=ec2-user ansible_ssh_private_key_file=~/taskflow.pem
+3.226.235.168 ansible_user=ec2-user ansible_ssh_private_key_file=~/taskflow.pem
