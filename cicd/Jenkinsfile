@@ -88,7 +88,7 @@ pipeline {
             steps {
                 echo "✅ Trivy Security scan for Docker image"
                 sh '''
-                trivy image \
+                TMPDIR=/home/jenkins/tmp trivy image \
                 --scanners vuln \
                 --severity HIGH,CRITICAL \
                 --exit-code 1 \
