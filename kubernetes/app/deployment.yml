@@ -3,7 +3,7 @@ kind: Deployment
 
 metadata:
   name: taskflow
-  namespace: taskflow
+  namespace: taskflow-app
 
 spec:
   replicas: 2

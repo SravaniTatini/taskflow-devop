@@ -3,7 +3,7 @@ kind: Service
 
 metadata:
   name: taskflow-service
-  namespace: taskflow
+  namespace: taskflow-app
 
 spec:
   type: LoadBalancer
