@@ -31,19 +31,19 @@ spec:
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
-              name: mysql-config
+              name: taskflow-config
               key: DB_HOST
 
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
-              name: mysql-config
+              name: taskflow-config
               key: DB_PORT
 
         - name: DB_NAME
           valueFrom:
             configMapKeyRef:
-              name: mysql-config
+              name: taskflow-config
               key: DB_NAME
 
         - name: DB_USERNAME
