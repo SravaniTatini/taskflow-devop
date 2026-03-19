@@ -4,6 +4,6 @@ metadata:
   name: taskflow-config
   namespace: taskflow-app
 data:
-  DB_HOST: "taskflow-database.csb8wui0i2kc.us-east-1.rds.amazonaws.com"   
+  DB_HOST: "taskflow-db.csb8wui0i2kc.us-east-1.rds.amazonaws.com"   
   DB_PORT: "3306"
   DB_NAME: "taskflow"
