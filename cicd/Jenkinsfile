@@ -3,6 +3,9 @@ pipeline {
 
     tools {
         maven 'maven_3'
+
+        sonarQubeScanner 'SonarQube'
+    
     }
 
     environment {
@@ -11,6 +14,8 @@ pipeline {
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
 
+        
+        SONAR_TOKEN = credentials('sonar-token')
     
     }
 
@@ -34,16 +39,14 @@ pipeline {
             }
         }
 
-        stage('SonarQube Scan') {
+        stage('SonarCloud Analysis') {
             steps {
-                dir("app/taskflow") {
-                  withSonarQubeEnv('SonarQube') {
-                        sh '''
-                          mvn sonar:sonar \
-                          -Dsonar.projectKey=taskflow
-                        '''
-                    }
-                 }
+                withSonarQubeEnv('SonarCloud') {
+                    sh '''
+                    sonar-scanner \
+                      -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
             }
         }
 
