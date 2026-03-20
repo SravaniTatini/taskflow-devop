@@ -1,61 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { getTasks, createTask } from "./services/api";
+import { useState } from "react";
+import Header from "./components/Header";
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
 
-function App() {
+export default function App() {
   const [tasks, setTasks] = useState([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [dark, setDark] = useState(false);
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  const loadTasks = async () => {
-    const res = await getTasks();
-    setTasks(res.data);
+  const addTask = (title, desc) => {
+    setTasks([
+      ...tasks,
+      { id: Date.now(), title, desc, completed: false },
+    ]);
   };
 
-  const addTask = async () => {
-    if (!title || !description) return;
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((t) =>
+        t.id === id ? { ...t, completed: !t.completed } : t
+      )
+    );
+  };
 
-    await createTask({
-      title,
-      description,
-      status: "OPEN"
-    });
-
-    setTitle("");
-    setDescription("");
-    loadTasks();
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>TaskFlow</h1>
+    <div className={dark ? "dark" : ""}>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition duration-300">
 
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Task title"
-      />
+        <Header dark={dark} setDark={setDark} />
 
-      <input
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Task description"
-      />
+        <main className="max-w-3xl mx-auto mt-10 px-4">
+          <TaskForm addTask={addTask} />
+          <TaskList
+            tasks={tasks}
+            toggleTask={toggleTask}
+            deleteTask={deleteTask}
+          />
+        </main>
 
-      <button onClick={addTask}>Add Task</button>
-
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <b>{task.title}</b> - {task.description} [{task.status}]
-          </li>
-        ))}
-      </ul>
+      </div>
     </div>
   );
 }
-
-export default App;
