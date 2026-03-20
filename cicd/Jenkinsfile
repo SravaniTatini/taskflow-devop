@@ -11,9 +11,8 @@ pipeline {
 
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
-
-        
-        SONAR_TOKEN = credentials('sonar-token')
+ 
+        APP_DIR = "app/taskflow"
     
     }
 
@@ -37,13 +36,16 @@ pipeline {
             }
         }
 
-       stage('SonarCloud Scan') {
+       stage('SonarQube Analysis') {
            steps {
-               dir("app/taskflow") {
-                   withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                      sh """
-                      mvn clean verify sonar:sonar \
-                     -Dsonar.login=${SONAR_TOKEN}"""
+               dir("$APP_DIR") {
+                    echo "✅ Running SonarQube Analysis"
+                   withSonarQubeEnv('SonarQube') {
+                      sh '''
+                      mvn sonar:sonar \
+                     -Dsonar.projectkey=taskflow \
+                     -Dsoanr.projectName=taskflow \
+                     '''
                     }
                 }
             }
