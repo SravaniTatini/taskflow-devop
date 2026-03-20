@@ -37,17 +37,22 @@ pipeline {
             }
         }
 
-        stage('SonarCloud Analysis') {
-            steps {
-                withSonarQubeEnv('SonarCloud') {
-                    sh '''
-                    sonar-scanner \
-                      -Dsonar.login=$SONAR_TOKEN
-                    '''
+        stage('SonarQube Scan') {
+           steps {
+               dir("app/taskflow") {
+                  withSonarQubeEnv('SonarQube') {
+                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=taskflow \
+                        -Dsonar.host.url=$SONAR_HOST \
+                        -Dsonar.login=$SONAR_TOKEN
+                        """
+                        } 
+                    }
                 }
-            }
+            }  
         }
-
 
         stage('Building Docker Image') {
             steps {
