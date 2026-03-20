@@ -28,12 +28,11 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		
+		<sonar.projectKey>Sravanitatini_taskflow-devops-platform</sonar.projectKey>
+		<sonar.organization>sravanitatini</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
-	<properties>
-        <sonar.projectKey>SravaniTatini_taskflow-devop</sonar.projectKey>
-        <sonar.organization>sravanitatini</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    </properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
