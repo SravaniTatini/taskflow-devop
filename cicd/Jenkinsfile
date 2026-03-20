@@ -40,7 +40,7 @@ pipeline {
         stage('SonarQube Scan') {
            steps {
                dir("app/taskflow") {
-                  withSonarQubeEnv('SonarQube') {
+                  withSonarQubeEnv('SonarCloud') {
                      withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         sh """
                         mvn clean verify sonar:sonar \
