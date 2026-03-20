@@ -41,14 +41,13 @@ pipeline {
            steps {
                dir("app/taskflow") {
                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                   sh """
-                   mvn clean verify sonar:sonar \
-                   -Dsonar.login=${SONAR_TOKEN}
-                   """
-                   }
+                      sh """
+                      mvn clean verify sonar:sonar \
+                     -Dsonar.login=${SONAR_TOKEN}"""
+                    }
                 }
             }
-     }
+        }
 
         stage('Building Docker Image') {
             steps {
