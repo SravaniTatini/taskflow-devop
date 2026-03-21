@@ -7,7 +7,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "tasks")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
@@ -16,15 +17,16 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(length = 1000)
     private String description;
 
     private String status;
 
-    // ✅ NEW FIELD
-    private String priority; // LOW, MEDIUM, HIGH
+    // LOW, MEDIUM, HIGH
+    private String priority;
 
-    // ✅ NEW FIELD
     private LocalDate dueDate;
 }
