@@ -2,12 +2,17 @@ package com.taskflow.controller;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.taskflow.service.TaskService;
 
 import com.taskflow.dto.TaskDTO;
 import com.taskflow.entity.Task;
+import com.taskflow.security.JwtUtil;
 import com.taskflow.service.TaskService;
 
 @RestController
@@ -15,45 +20,47 @@ import com.taskflow.service.TaskService;
 @CrossOrigin(origins = "*")
 public class TaskController {
 
-    private final TaskService service;
+    private final TaskService taskService;
 
-    public TaskController(TaskService service){
-        this.service = service;
+    public TaskController(TaskService taskService){
+        this.taskService = taskService;
     }
 
     // ✅ GET all
     @GetMapping
-    public List<Task> getTasks(){
-        return service.getAllTasks();
+    public ResponseEntity<?> createTask(@RequestBody Task task, HttpServletRequest request) {
+        
+        if (request.getAttribute("user") == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+         }   
+
+        return ResponseEntity.ok(taskService.save(task));
     }
 
     // ✅ CREATE
-    @PostMapping
-    public Task createTask(@Valid @RequestBody TaskDTO dto){
-
-        Task task = new Task();
-
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
-        task.setStatus(dto.getStatus());
-
-        // ✅ NEW
-        task.setPriority(dto.getPriority());
-        task.setDueDate(dto.getDueDate());
-
-        return service.createTask(task);
-    }
-
-    // ✅ UPDATE (IMPORTANT for drag-drop sync)
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
-        updatedTask.setId(id);
-        return service.createTask(updatedTask);
-    }
+    public ResponseEntity<?> updateTask(@PathVariable Long id,
+                                        @RequestBody Task task,
+                                        HttpServletRequest request) {
+
+        if (request.getAttribute("user") == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+         }
+
+        task.setId(id);
+        return ResponseEntity.ok(taskService.save(task));
+   }
 
     // ✅ DELETE
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) {
-        service.deleteTask(id);
+    public ResponseEntity<?> deleteTask(@PathVariable Long id,
+                                        HttpServletRequest request) {
+
+        if (request.getAttribute("user") == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+       }
+
+       taskService.delete(id);
+       return ResponseEntity.ok("Deleted");
     }
 }

@@ -2,25 +2,26 @@ package com.taskflow.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
 import java.security.Key;
 import java.util.Date;
 
 public class JwtUtil {
 
-    // 🔑 Secret key used to sign token
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final String SECRET = "mysecretkeymysecretkeymysecretkey"; // min 32 chars
+    private static final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // ✅ Generate JWT token
+    // CREATE TOKEN
     public static String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(username) // who the user is
-                .setIssuedAt(new Date()) // current time
+                .setSubject(username)
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
-                .signWith(key) // sign token
+                .signWith(key)
                 .compact();
     }
 
-    // ✅ Validate token and extract username
+    // VALIDATE TOKEN
     public static String validateToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
