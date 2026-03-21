@@ -5,7 +5,7 @@ export default function Login({ setLoggedIn }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:8080/api/auth/login", {
+    const res = await fetch("http://3.235.240.29:8080/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
