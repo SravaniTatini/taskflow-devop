@@ -11,7 +11,8 @@ import com.taskflow.entity.Task;
 import com.taskflow.service.TaskService;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks") // ✅ updated path
+@CrossOrigin(origins = "*")
 public class TaskController {
 
     private final TaskService service;
@@ -20,11 +21,13 @@ public class TaskController {
         this.service = service;
     }
 
+    // ✅ GET all
     @GetMapping
     public List<Task> getTasks(){
         return service.getAllTasks();
     }
 
+    // ✅ CREATE
     @PostMapping
     public Task createTask(@Valid @RequestBody TaskDTO dto){
 
@@ -34,7 +37,23 @@ public class TaskController {
         task.setDescription(dto.getDescription());
         task.setStatus(dto.getStatus());
 
+        // ✅ NEW
+        task.setPriority(dto.getPriority());
+        task.setDueDate(dto.getDueDate());
+
         return service.createTask(task);
     }
 
+    // ✅ UPDATE (IMPORTANT for drag-drop sync)
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+        updatedTask.setId(id);
+        return service.createTask(updatedTask);
+    }
+
+    // ✅ DELETE
+    @DeleteMapping("/{id}")
+    public void deleteTask(@PathVariable Long id) {
+        service.deleteTask(id);
+    }
 }

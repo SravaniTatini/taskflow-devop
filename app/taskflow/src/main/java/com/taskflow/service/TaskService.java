@@ -24,6 +24,11 @@ public class TaskService {
         return repository.save(task);
     }
 
+    // ✅ NEW (explicit update method)
+    public Task updateTask(Task task){
+        return repository.save(task);
+    }
+
     public Task getTaskById(Long id){
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
@@ -32,5 +37,4 @@ public class TaskService {
     public void deleteTask(Long id){
         repository.deleteById(id);
     }
-
 }

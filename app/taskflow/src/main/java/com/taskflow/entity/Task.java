@@ -3,6 +3,8 @@ package com.taskflow.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "tasks")
 @Data
@@ -20,4 +22,9 @@ public class Task {
 
     private String status;
 
+    // ✅ NEW FIELD
+    private String priority; // LOW, MEDIUM, HIGH
+
+    // ✅ NEW FIELD
+    private LocalDate dueDate;
 }

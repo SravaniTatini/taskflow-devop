@@ -1,24 +1,24 @@
-import TaskCard from "./TaskCard";
+<div className="flex gap-6 mt-8 overflow-x-auto">
 
-export default function TaskList({ tasks, toggleTask, deleteTask }) {
-  if (tasks.length === 0) {
-    return (
-      <p className="text-center text-gray-500 dark:text-gray-400">
-        No tasks yet
-      </p>
-    );
-  }
+  <Column
+    title="To Do"
+    tasks={tasks.todo}
+    moveTask={moveTask}
+    type="todo"
+  />
 
-  return (
-    <div className="space-y-4">
-      {tasks.map((task) => (
-        <TaskCard
-          key={task.id}
-          task={task}
-          toggleTask={toggleTask}
-          deleteTask={deleteTask}
-        />
-      ))}
-    </div>
-  );
-}
+  <Column
+    title="In Progress"
+    tasks={tasks.inProgress}
+    moveTask={moveTask}
+    type="inProgress"
+  />
+
+  <Column
+    title="Done"
+    tasks={tasks.done}
+    moveTask={moveTask}
+    type="done"
+  />
+
+</div>
