@@ -158,17 +158,17 @@ pipeline {
                 echo "✅ Updating Kubernetes manifests with new image tags"
                 sh '''
                    echo "Verifying workspace paths..."
-                   ls -ltr kubernetes/app/backend
+                   ls -ltr kubernetes/app/Backend
                    ls -ltr kubernetes/app/Frontend
 
                    #Backend image update
-                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/backend/deployment.yaml
+                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Backend/deployment.yaml
 
                    # Frontend image update
                    sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Frontend/frontend-deployment.yaml
                 
                    echo "✅ Updated backend manifest:"
-                   cat kubernetes/app/backend/deployment.yml
+                   cat kubernetes/app/Backend/deployment.yml
 
                    echo "✅ Updated frontend manifest:"
                    cat kubernetes/app/Frontend/frontend-deployment.yml
