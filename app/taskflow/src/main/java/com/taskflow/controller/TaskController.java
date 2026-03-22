@@ -13,10 +13,11 @@ import com.taskflow.service.TaskService;
 import com.taskflow.dto.TaskDTO;
 import com.taskflow.entity.Task;
 import com.taskflow.security.JwtUtil;
-import com.taskflow.service.TaskService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
-@RequestMapping("/api/tasks") // ✅ updated path
+@RequestMapping("/tasks") // ✅ updated path
 @CrossOrigin(origins = "*")
 public class TaskController {
 
@@ -28,39 +29,49 @@ public class TaskController {
 
     // ✅ GET all
     @GetMapping
-    public ResponseEntity<?> createTask(@RequestBody Task task, HttpServletRequest request) {
+    public ResponseEntity<?> getAllTasks(HttpServletRequest request) {
         
         if (request.getAttribute("user") == null) {
             return ResponseEntity.status(401).body("Unauthorized");
          }   
 
-        return ResponseEntity.ok(taskService.save(task));
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     // ✅ CREATE
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Long id,
-                                        @RequestBody Task task,
-                                        HttpServletRequest request) {
+    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+
+        Task existing = taskService.getTaskById(id);
+
+        existing.setTitle(updatedTask.getTitle());
+        existing.setDescription(updatedTask.getDescription());
+        existing.setStatus(updatedTask.getStatus());
+
+        return taskService.save(existing);
+    }
+
+    // ✅ CREATE TASK
+    @PostMapping
+    public ResponseEntity<?> createTask(@RequestBody Task task, HttpServletRequest request) {
 
         if (request.getAttribute("user") == null) {
             return ResponseEntity.status(401).body("Unauthorized");
-         }
+        }
 
-        task.setId(id);
         return ResponseEntity.ok(taskService.save(task));
-   }
+    }
 
-    // ✅ DELETE
+    // ✅ DELETE TASK
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTask(@PathVariable Long id,
                                         HttpServletRequest request) {
 
         if (request.getAttribute("user") == null) {
             return ResponseEntity.status(401).body("Unauthorized");
-       }
+        }
 
-       taskService.delete(id);
-       return ResponseEntity.ok("Deleted");
+        taskService.delete(id);
+        return ResponseEntity.ok("Deleted");
     }
 }

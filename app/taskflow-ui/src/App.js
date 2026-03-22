@@ -21,7 +21,7 @@ export default function App() {
 
   // LOAD TASKS
   useEffect(() => {
-    fetch("http://3.235.240.29:8080/api/tasks")
+    fetch(`${process.env.REACT_APP_API_URL}/tasks`)
       .then((res) => res.json())
       .then((data) => {
         const grouped = {
@@ -44,7 +44,7 @@ export default function App() {
 
   // ADD TASK
   const addTask = async (title, desc, priority, dueDate) => {
-    const res = await fetch("http://3.235.240.29:8080/api/tasks", {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function App() {
   const moveTask = async (task, from, to) => {
     const updated = { ...task, status: to };
 
-    await fetch(`http://3.235.240.29:8080/api/tasks/${task.id}`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/tasks/${task.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
