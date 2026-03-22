@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: taskflow-ui
-          image: sravani2310/taskflow-ui:latest
+          image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}
 
           ports:
             - containerPort: 80
