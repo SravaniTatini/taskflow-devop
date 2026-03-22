@@ -7,8 +7,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "sravani2310/taskflow:BUILD_NUMBER"
-        DOCKER_UI_IMAGE = "sravani2310/taskflow-ui:BUILD_NUMBER"
+        DOCKER_IMAGE = "sravani2310/taskflow"
+        DOCKER_UI_IMAGE = "sravani2310/taskflow-ui"
 
 
         GIT_REPO_NAME = "taskflow-devop"
@@ -92,6 +92,7 @@ pipeline {
 
                 sh '''
                     docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    docker push ${DOCKER_IMAGE}:latest
                 '''
             }
         }
@@ -145,6 +146,7 @@ pipeline {
 
                 sh '''
                     docker push ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}
+                    docker push ${DOCKER_UI_IMAGE}:latest
                 '''
             }
         }
@@ -155,8 +157,8 @@ pipeline {
            steps {
                 echo "✅ Updating Kubernetes manifests with new image tags"
                 sh '''
-                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" k8s/backend-deployment.yaml
-                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" k8s/ui-deployment.yaml
+                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g"
+                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g"
                 '''
             }
         }
