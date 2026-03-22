@@ -21,7 +21,7 @@ spec:
       containers:
       - name: taskflow
 
-        image: sravani2310/taskflow:8
+        image: sravani2310/taskflow:11
 
         ports:
         - containerPort: 8080
