@@ -162,10 +162,10 @@ pipeline {
                    ls -ltr kubernetes/app/Frontend
 
                    #Backend image update
-                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Backend/deployment.yaml
+                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Backend/deployment.yml
 
                    # Frontend image update
-                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Frontend/frontend-deployment.yaml
+                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Frontend/frontend-deployment.yml
                 
                    echo "✅ Updated backend manifest:"
                    cat kubernetes/app/Backend/deployment.yml
