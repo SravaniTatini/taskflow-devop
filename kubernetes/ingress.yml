@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: taskflow-ingress
+  namespace: taskflow
+
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+
+    # HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:450937501080:certificate/9492d7e0-5341-44f7-8376-fdff590975a1
+
+    # Redirect HTTP → HTTPS
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+spec:
+  rules:
+
+    # FRONTEND
+    - host: vahin.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: taskflow-ui-service
+                port:
+                  number: 80
+
+    # BACKEND
+    - host: api.vahin.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: taskflow-api-service
+                port:
+                  number: 80

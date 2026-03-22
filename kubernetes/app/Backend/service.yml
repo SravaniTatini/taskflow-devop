@@ -3,10 +3,10 @@ kind: Service
 
 metadata:
   name: taskflow-service
-  namespace: taskflow-app
+  namespace: taskflow
 
 spec:
-  type: LoadBalancer
+  type: ClusterIP
 
   selector:
     app: taskflow

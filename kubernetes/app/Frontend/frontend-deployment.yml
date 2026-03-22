@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskflow-ui
+  namespace: taskflow
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: taskflow-ui
+
+  template:
+    metadata:
+      labels:
+        app: taskflow-ui
+
+    spec:
+      containers:
+        - name: taskflow-ui
+          image: sravani2310/taskflow-ui:latest
+
+          ports:
+            - containerPort: 80
+
+          envFrom:
+            - configMapRef:
+                name: taskflow-ui-config

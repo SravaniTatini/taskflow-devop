@@ -7,17 +7,21 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "sravani2310/taskflow"
+        DOCKER_IMAGE = "sravani2310/taskflow:BUILD_NUMBER"
+        DOCKER_UI_IMAGE = "sravani2310/taskflow-ui:BUILD_NUMBER"
+
 
         GIT_REPO_NAME = "taskflow-devop"
         GIT_USER_NAME = "SravaniTatini"
  
-        APP_DIR = "app/taskflow"
+        APP_DIR_BACKEND = "app/taskflow"
+        APP_DIR_FRONTEND = "app/taskflow-ui"
     
     }
 
     stages {
 
+        // ------------------- CHECKOUT ---------------------------------------
         stage('Checkout') {
             steps {
                 echo "✅ Cloning GitHub Repo"
@@ -25,11 +29,12 @@ pipeline {
             }
         }
 
+       // ---------------------- BACKEND ----------------------------------------
 
         stage('Building WAR') {
             steps {
                 echo "✅ Building Spring Boot Application "
-                dir("app/taskflow") {
+                dir("$APP_DIR_BACKEND") {
                     sh "mvn clean package -DskipTests"
                     sh "ls -ltr target"
                 }
@@ -38,13 +43,13 @@ pipeline {
 
        stage('SonarQube Analysis') {
            steps {
-               dir("$APP_DIR") {
+               dir("$APP_DIR_BACKEND") {
                     echo "✅ Running SonarQube Analysis"
                    withSonarQubeEnv('SonarQube') {
                       sh '''
                       mvn sonar:sonar \
                      -Dsonar.projectkey=taskflow \
-                     -Dsoanr.projectName=taskflow \
+                     -Dsonar.projectName=taskflow \
                      '''
                     }
                 }
@@ -54,15 +59,15 @@ pipeline {
         stage('Building Docker Image') {
             steps {
                 echo "✅ Building Docker image"
-                sh """
+                sh '''
                     docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -f app/taskflow/Dockerfile app/taskflow
                     docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
-                """
+                '''
             }
         }
 
 
-        stage('Trivy Scan') {
+        stage('Trivy Scan- Backend') {
             steps {
                 echo "✅ Trivy Security scan for Docker image"
                 sh '''
@@ -74,7 +79,7 @@ pipeline {
                 ${DOCKER_IMAGE}:${BUILD_NUMBER}
              '''
              }
-     }
+        }
 
         stage('Push Docker Image') {
             steps {
@@ -85,12 +90,103 @@ pipeline {
                     '''
                 }
 
-                sh """
+                sh '''
                     docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                    docker push ${DOCKER_IMAGE}:latest
-                """
+                '''
             }
         }
 
+        // ----------------------- FRONTEND ---------------------------------------
+          
+        stage('Build React App') {
+            steps {
+                dir("$APP_DIR_FRONTEND") {
+                    sh '''
+                        export REACT_APP_API_URL=${REACT_APP_API_URL}
+                        npm install
+                        npm run build
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Image - UI') {
+            steps {
+                echo "✅ Building Docker image for UI"
+                sh '''
+                    docker build -t ${DOCKER_UI_IMAGE}:${BUILD_NUMBER} -f app/taskflow-ui/Dockerfile app/taskflow-ui
+                    docker tag ${DOCKER_UI_IMAGE}:${BUILD_NUMBER} ${DOCKER_UI_IMAGE}:latest
+                '''
+            }
+        }   
+
+        stage('Trivy Scan- UI') {
+            steps {
+                echo "✅ Trivy Security scan for Docker image"
+                sh '''
+                TMPDIR=/home/jenkins/tmp trivy image \
+                --scanners vuln \
+                --severity CRITICAL \
+                --exit-code 0 \
+                --no-progress \
+                ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}
+             '''
+             }
+        }
+
+        stage('Push UI Docker Image') {
+            steps {
+                echo "✅ Pushing UI image to DockerHub"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+
+                sh '''
+                    docker push ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "Build Successful 🎉"
+        }
+        failure {
+            echo "Build Failed ❌"
+        }
+    }
+
+    // ----------------------- UPDATING KUBERNETES MANIFESTS ----------------------------
+
+    stage('Update Kubernetes Manifests') {
+        steps {
+            echo "✅ Updating Kubernetes manifests with new image tags"
+            sh '''
+                sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" k8s/backend-deployment.yaml
+                sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" k8s/ui-deployment.yaml
+            '''
+         }
+    }
+
+    // ----------------------- COMMIT & PUSH TO GITHUB ----------------------------
+
+    stage('Push to GitOps Repo') {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                sh '''
+                    git config user.name "jenkins"
+                    git config user.email "jenkins@local"
+
+                    git add .
+                    git commit -m "Update image tag to ${BUILD_NUMBER}" || echo "No changes"
+
+                    git push https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+               '''
+            }
+        }
     }
 }
