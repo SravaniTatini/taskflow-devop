@@ -26,4 +26,4 @@ spec:
 
           envFrom:
             - configMapRef:
-                name: taskflow-ui-config
+                name: frontend-config
