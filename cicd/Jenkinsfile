@@ -157,16 +157,21 @@ pipeline {
            steps {
                 echo "✅ Updating Kubernetes manifests with new image tags"
                 sh '''
-                   echo "Current dir:"
-                   pwd
-                   echo "Listing k8s folder:"
-                   ls -ltr k8s
+                   echo "Verifying workspace paths..."
+                   ls -ltr kubernetes/app/backend
+                   ls -ltr kubernetes/app/Frontend
 
-                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" k8s/backend-deployment.yaml
-                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" k8s/ui-deployment.yaml
+                   #Backend image update
+                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/backend/deployment.yaml
+
+                   # Frontend image update
+                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" kubernetes/app/Frontend/frontend-deployment.yaml
                 
-                   echo "Updated backend manifest:"
-                   cat k8s/backend-deployment.yaml
+                   echo "✅ Updated backend manifest:"
+                   cat kubernetes/app/backend/deployment.yml
+
+                   echo "✅ Updated frontend manifest:"
+                   cat kubernetes/app/Frontend/frontend-deployment.yml
                 '''
             }
         }
