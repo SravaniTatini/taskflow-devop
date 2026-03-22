@@ -3,7 +3,7 @@ kind: Deployment
 
 metadata:
   name: taskflow
-  namespace: taskflow
+  namespace: argocd
 
 spec:
   replicas: 2

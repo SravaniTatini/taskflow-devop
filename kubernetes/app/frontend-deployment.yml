@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: taskflow-ui
-  namespace: taskflow
+  namespace: argocd
 
 spec:
   replicas: 2

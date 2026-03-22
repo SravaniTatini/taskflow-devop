@@ -3,7 +3,7 @@ kind: Ingress
 
 metadata:
   name: taskflow-ingress
-  namespace: taskflow
+  namespace: argocd
 
   annotations:
     kubernetes.io/ingress.class: alb

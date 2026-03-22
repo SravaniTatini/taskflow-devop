@@ -3,7 +3,7 @@ kind: Service
 
 metadata:
   name: taskflow-service
-  namespace: taskflow
+  namespace: argocd
 
 spec:
   type: ClusterIP
