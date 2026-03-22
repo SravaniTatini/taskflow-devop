@@ -157,8 +157,8 @@ pipeline {
            steps {
                 echo "✅ Updating Kubernetes manifests with new image tags"
                 sh '''
-                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g"
-                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g"
+                   sed -i 's|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g' kubernetes/app/Backend/deployment.yml
+                   sed -i 's|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g' kubernetes/app/Frontend/frontend-deployment.yml
                 '''
             }
         }
