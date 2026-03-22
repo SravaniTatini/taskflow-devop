@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: taskflow-ui
-          image: sravani2310/taskflow-ui:8
+          image: sravani2310/taskflow-ui:10
 
           ports:
             - containerPort: 80
