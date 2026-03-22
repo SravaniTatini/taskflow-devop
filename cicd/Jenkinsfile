@@ -149,7 +149,37 @@ pipeline {
             }
         }
 
+        // ----------------------- UPDATING KUBERNETES MANIFESTS ----------------------------
+
+        stage('Update Kubernetes Manifests') {
+           steps {
+                echo "✅ Updating Kubernetes manifests with new image tags"
+                sh '''
+                   sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" k8s/backend-deployment.yaml
+                   sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" k8s/ui-deployment.yaml
+                '''
+            }
+        }
+
+       // ----------------------- COMMIT & PUSH TO GITHUB ----------------------------
+
+        stage('Push to GitOps Repo') {
+           steps {
+               withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                  sh '''
+                    git config user.name "jenkins"
+                    git config user.email "jenkins@local"
+
+                    git add .
+                    git commit -m "Update image tag to ${BUILD_NUMBER}" || echo "No changes"
+
+                    git push https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+                   '''
+                }
+            }
+        }
     }
+
 
     post {
         success {
@@ -159,34 +189,5 @@ pipeline {
             echo "Build Failed ❌"
         }
     }
-
-    // ----------------------- UPDATING KUBERNETES MANIFESTS ----------------------------
-
-    stage('Update Kubernetes Manifests') {
-        steps {
-            echo "✅ Updating Kubernetes manifests with new image tags"
-            sh '''
-                sed -i "s|image: sravani2310/taskflow:.*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" k8s/backend-deployment.yaml
-                sed -i "s|image: sravani2310/taskflow-ui:.*|image: ${DOCKER_UI_IMAGE}:${BUILD_NUMBER}|g" k8s/ui-deployment.yaml
-            '''
-         }
-    }
-
-    // ----------------------- COMMIT & PUSH TO GITHUB ----------------------------
-
-    stage('Push to GitOps Repo') {
-        steps {
-            withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                sh '''
-                    git config user.name "jenkins"
-                    git config user.email "jenkins@local"
-
-                    git add .
-                    git commit -m "Update image tag to ${BUILD_NUMBER}" || echo "No changes"
-
-                    git push https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
-               '''
-            }
-        }
-    }
 }
+    
